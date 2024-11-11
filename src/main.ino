@@ -1,9 +1,19 @@
 #include <Arduino.h>
+#include "main.h"
 
+// local libraries
+
+#include <wifiModule.h>
+#include <restartReason.h>
+#include <hap-client.h>
+
+#ifdef LVGL_ENABLED
 #include <esp32_smartdisplay.h>
 #include <ui/ui.h>
+#endif
 
-
+String buildDefinitionString = "";
+#define addBuildDefinition(name) buildDefinitionString += #name " ";
 
 void setup()
 {
@@ -12,14 +22,24 @@ void setup()
 #endif
   Serial.begin(115200);
   Serial.setDebugOutput(true);
-
-
+  logSection(PIOENV);
   log_i("Board: %s", BOARD_NAME);
   log_i("CPU: %s rev%d, CPU Freq: %d Mhz, %d core(s)", ESP.getChipModel(), ESP.getChipRevision(), getCpuFrequencyMhz(), ESP.getChipCores());
   log_i("Free heap: %d bytes", ESP.getFreeHeap());
   log_i("Free PSRAM: %d bytes", ESP.getPsramSize());
   log_i("SDK version: %s", ESP.getSdkVersion());
+  log_i("Restart Reason: %s", getLastRestartReason().c_str());
+#ifdef LVGL_ENABLED
+  addBuildDefinition("LVGL_ENABLED");
+#endif
 
+  log_i("Build Definitions: %s", buildDefinitionString.c_str());
+  logSection("WiFi Setup");
+  wifiModuleSetup();
+  log_i("ESP Information %s", PIOENV);
+   logSection("hapClient Setup");
+  hapClientSetup();
+#ifdef LVGL_ENABLED
   log_i("Initializing Smart Display");
   smartdisplay_init();
   log_i("LV_USE_LOG %d", LV_USE_LOG);
@@ -34,14 +54,20 @@ void setup()
   // lv_disp_set_rotation(disp, LV_DISP_ROT_270);
   log_i("ui_init");
   ui_init();
-  // To use third party libraries, enable the define in lv_conf.h: #define LV_USE_QRCODE 1
+// To use third party libraries, enable the define in lv_conf.h: #define LV_USE_QRCODE 1
+#endif
 }
 
+#ifdef LVGL_ENABLED
 ulong next_millis;
 auto lv_last_tick = millis();
+#endif
 
 void loop()
 {
+  wifiModuleLoop();
+  hapClientLoop();
+#ifdef LVGL_ENABLED
   auto const now = millis();
 
   // Update the ticker
@@ -49,4 +75,5 @@ void loop()
   lv_last_tick = now;
   // Update the UI
   lv_timer_handler();
+#endif
 }

@@ -1,19 +1,40 @@
 #include <Arduino.h>
 #include "main.h"
 
+#include <WiFi.h>
+#include <TickTwo.h>
+
 // local libraries
 
 #include <wifiModule.h>
 #include <restartReason.h>
-#include <hap-client.h>
+#include <hapCache.h>
+#include <ui-client.h>
+#include <display.h>
 
 #ifdef LVGL_ENABLED
 #include <esp32_smartdisplay.h>
 #include <ui/ui.h>
 #endif
 
+void configRefresh();
+TickTwo configRefreshTick(configRefresh, 0); // Run once on startup
+
 String buildDefinitionString = "";
 #define addBuildDefinition(name) buildDefinitionString += #name " ";
+
+/**
+ * @brief Refresh the config from the Homebridge UI Server
+ * 
+ */
+void configRefresh()
+{
+  logSection("hapClient Get Config");
+  auto config = uiClientGetConfig();
+  log_i("Config: %s", config.as<String>().c_str());
+  displaySetConfig(config);
+  configRefreshTick.interval(15 * 60 * 1000); // Refresh every 15 minutes
+}
 
 void setup()
 {
@@ -37,8 +58,9 @@ void setup()
   logSection("WiFi Setup");
   wifiModuleSetup();
   log_i("ESP Information %s", PIOENV);
-   logSection("hapClient Setup");
-  hapClientSetup();
+  logSection("hapClient Setup");
+  hapCacheSetup();
+  configRefreshTick.start();
 #ifdef LVGL_ENABLED
   log_i("Initializing Smart Display");
   smartdisplay_init();
@@ -66,7 +88,13 @@ auto lv_last_tick = millis();
 void loop()
 {
   wifiModuleLoop();
-  hapClientLoop();
+  hapCacheLoop();
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    configRefreshTick.update();
+  }
+  displayLoop();
+
 #ifdef LVGL_ENABLED
   auto const now = millis();
 

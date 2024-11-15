@@ -10,6 +10,7 @@
 #include <restartReason.h>
 #include <hapCache.h>
 #include <ui-client.h>
+#include <homekitDeviceController.h>
 #include <display.h>
 
 #ifdef LVGL_ENABLED
@@ -33,7 +34,7 @@ void configRefresh()
   auto config = uiClientGetConfig();
   log_i("Config: %s", config.as<String>().c_str());
   displaySetConfig(config);
-  configRefreshTick.interval(15 * 60 * 1000); // Refresh every 15 minutes
+  configRefreshTick.interval(15 * 60 * 1000 * 1000); // Refresh every 15 minutes
 }
 
 void setup()

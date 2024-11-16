@@ -17,5 +17,6 @@ extern std::map<String, HapService> hapCache;
 
 void hapCacheSetup();
 void hapCacheLoop();
+void hapCacheRefresh();
 
 #endif

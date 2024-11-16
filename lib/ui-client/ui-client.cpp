@@ -1,11 +1,11 @@
 #include <ArduinoJson.hpp>
 
-void uiClientSetup(){
-
+void uiClientSetup()
+{
 }
 
-void uiClientLoop(){
-
+void uiClientLoop()
+{
 }
 
 /*
@@ -18,13 +18,22 @@ void uiClientLoop(){
 }]
 */
 /**
- * @brief 
- * 
- * @return ArduinoJson::DynamicJsonDocument 
+ * @brief
+ *
+ * @return ArduinoJson::DynamicJsonDocument
  */
-ArduinoJson::DynamicJsonDocument uiClientGetConfig(){
+ArduinoJson::DynamicJsonDocument uiClientGetConfig()
+{
   ArduinoJson::DynamicJsonDocument doc(1024);
   ArduinoJson::JsonArray arr = doc.to<ArduinoJson::JsonArray>();
+
+  ArduinoJson::JsonObject obj1 = arr.createNestedObject();
+  obj1["instanceName"] = "Heisenberg-4534";
+  obj1["uuid"] = "25";
+  obj1["displayName"] = "Yamaha Power";
+  obj1["aid"] = 7;
+  obj1["iid"] = 10;
+
   ArduinoJson::JsonObject obj = arr.createNestedObject();
   obj["instanceName"] = "Tasmota-CC79";
   obj["uuid"] = "43";

@@ -33,6 +33,8 @@ public:
   // Method to get characteristic
   bool regEvents();
 
+  void loop();
+
 private:
   String instanceName;
   String uuid;

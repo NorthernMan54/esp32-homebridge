@@ -9,6 +9,7 @@ void displaySetup()
 
 void displayLoop()
 {
+  hapDevices.loop();
 }
 
 void displaySetConfig(ArduinoJson::DynamicJsonDocument tiles)

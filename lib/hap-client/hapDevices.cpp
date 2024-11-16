@@ -47,6 +47,14 @@ void HAPDevice::addDevices(ArduinoJson::DynamicJsonDocument tiles)
     }
   }
 }
+
+void HAPDevice::loop()
+{
+  for (int i = 0; i < accessoryCount; i++)
+  {
+    accessories[i]->loop();
+  }
+}
 HAPDevice::HAPDevice()
 {
 }
@@ -103,41 +111,7 @@ String HAPDevice::getCharacteristic()
 
 bool HAPDevice::regEvents()
 {
-  /*
-  HapService service;
-  if (hapCache.find(instanceName) != hapCache.end())
-  {
-    service = hapCache[instanceName];
-    Serial.printf("Cached Service - Name: %s, IP: %s, Port: %d\n",
-                  service.name.c_str(),
-                  service.ip.toString().c_str(),
-                  service.port);
-  }
-  else
-  {
-    return "Service not found";
-  }
 
-  String endpoint = "/characteristics";
-  String payload = "{ \"characteristics\": [{\"aid\": \"" + String(aid) +
-                   "\", \"iid\": \"" + String(iid) + "\", \"ev\": true }] }";
-
-  client.print("PUT " + endpoint + " HTTP/1.1\r\n");
-  client.print("Host: " + String(service.ip) + ":" + String(service.port) + "\r\n");
-  client.print("Content-Type: application/hap+json\r\n");
-  client.print("Content-Length: " + String(payload.length()) + "\r\n\r\n");
-  client.print(payload);
-
-  while (client.connected() && !client.available())
-    delay(10);
-  if (client.available())
-  {
-    String response = client.readString();
-    Serial.println("Subscription response: " + response);
-    return response.indexOf("200 OK") != -1;
-  }
-  return false;
-  */
 }
 
 /**

@@ -63,3 +63,8 @@ void hapCacheLoop()
 {
   hapServicesTick.update();
 }
+
+void hapCacheRefresh()
+{
+  hapServicesRefresh();
+}

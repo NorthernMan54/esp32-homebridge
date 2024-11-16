@@ -26,7 +26,7 @@ String buildDefinitionString = "";
 
 /**
  * @brief Refresh the config from the Homebridge UI Server
- * 
+ *
  */
 void configRefresh()
 {

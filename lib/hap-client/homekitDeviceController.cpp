@@ -8,6 +8,8 @@
 #include <WiFi.h>
 #include <HTTPMessageParser.cpp>
 
+#include <AsyncTCP.h>
+
 // local function declarations
 String registerMessage(String host, uint16_t aid, uint16_t iid);
 String registerPayload(uint16_t aid, uint16_t iid);
@@ -248,11 +250,12 @@ String HomeKitDeviceController::getCharacteristic()
 }
 
 // Registers a callback to be invoked when data is received
-void HomeKitDeviceController::setEventCallback(DataReceivedCallback callback)
-{
-  log_i("Setting event callback");
-  eventCallback = callback;
-}
+// callback signature is (char *data) containing the data received
+  void HomeKitDeviceController::setEventCallback(void (*callback)(const char *, Accessory *), Accessory *accessory)
+  {
+    eventCallback = callback;
+    contextAccessory = accessory;
+  }
 
 String registerMessage(String host, uint16_t aid, uint16_t iid)
 {

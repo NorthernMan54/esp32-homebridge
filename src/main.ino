@@ -18,9 +18,6 @@
 #include <ui/ui.h>
 #endif
 
-void configRefresh();
-TickTwo configRefreshTick(configRefresh, 0); // Run once on startup
-
 String buildDefinitionString = "";
 #define addBuildDefinition(name) buildDefinitionString += #name " ";
 
@@ -28,14 +25,6 @@ String buildDefinitionString = "";
  * @brief Refresh the config from the Homebridge UI Server
  *
  */
-void configRefresh()
-{
-  logSection("hapClient Get Config");
-  auto config = uiClientGetConfig();
-  log_i("Config: %s", config.as<String>().c_str());
-  displaySetConfig(config);
-  configRefreshTick.interval(15 * 60 * 1000 * 1000); // Refresh every 15 minutes
-}
 
 void setup()
 {
@@ -61,7 +50,7 @@ void setup()
   log_i("ESP Information %s", PIOENV);
   logSection("hapClient Setup");
   hapCacheSetup();
-  configRefreshTick.start();
+
 #ifdef LVGL_ENABLED
   log_i("Initializing Smart Display");
   smartdisplay_init();
@@ -90,11 +79,6 @@ void loop()
 {
   wifiModuleLoop();
   hapCacheLoop();
-  if (WiFi.status() == WL_CONNECTED)
-  {
-    configRefreshTick.update();
-  }
-  displayLoop();
 
 #ifdef LVGL_ENABLED
   auto const now = millis();

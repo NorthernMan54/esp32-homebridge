@@ -1,9 +1,12 @@
 #include "homeKitDeviceController.h"
 #include <ArduinoJson.hpp>
+#include <iterator>
+#include <algorithm>
 #include <HTTPClient.h>
 #include <TickTwo.h>
 #include "hapCache.h"
 #include <WiFi.h>
+#include <HTTPMessageParser.cpp>
 
 // local function declarations
 String registerMessage(String host, uint16_t aid, uint16_t iid);
@@ -19,63 +22,23 @@ String registerPayload(uint16_t aid, uint16_t iid);
   Body:
   {"characteristics":[{"aid":7,"iid":10,"value":0}]}
 */
-String processHttpResponse(String host, const char *data, size_t len)
+HTTPMessageParser processHttpResponse(String host, const char *data, size_t len)
 {
-  log_i("Processing HTTP response from: %s", host.c_str());
-  String response(data, len);
-
-  // Split headers and body
-  int headerEndIndex = response.indexOf("\r\n\r\n");
-  String headers = response.substring(0, headerEndIndex);
-  String body = response.substring(headerEndIndex + 4);
-
-  // Parse the status line (e.g., "HTTP/1.1 204 No Content")
-  int statusLineEnd = headers.indexOf("\r\n");
-  String statusLine = headers.substring(0, statusLineEnd);
-
-  // Check HTTP status code
-  int statusCode = statusLine.substring(10, 13).toInt();
-  Serial.printf("Status Code: %d\n", statusCode);
-
-  if (statusCode == 204)
-  {
-    Serial.println("No content in response.");
-  }
-
-  // Print headers
-  Serial.println("Headers:");
-  Serial.println(headers);
-
-  // Print body, if present
-  if (!body.isEmpty())
-  {
-    Serial.println("Body:");
-    Serial.println(body);
-  }
-  if (statusCode == 200)
-  {
-    // Parse the JSON body
-    ArduinoJson::DynamicJsonDocument doc(1024);
-    ArduinoJson::deserializeJson(doc, body);
-    ArduinoJson::JsonArray characteristics = doc["characteristics"];
-    for (ArduinoJson::JsonObject characteristic : characteristics)
-    {
-      uint16_t aid = characteristic["aid"];
-      uint16_t iid = characteristic["iid"];
-      String value = characteristic["value"];
-      log_i("Characteristic: %d.%d = %s", aid, iid, value.c_str());
-      return value;
-    }
-  }
+  HTTPMessageParser parser;
+  log_i("Processing HTTP response from: %s-%d", host.c_str(), len);
+  parser.parse(data, len);
+  return parser;
 }
 
 HomeKitDeviceController::HomeKitDeviceController(String instance, uint16_t accessoryAID, uint16_t accessoryIID)
     : instance(instance), aid(accessoryAID), iid(accessoryIID), eventCallback(nullptr), homekitDeviceTick([this]()
-                                                                                                          { reconnect(); }, 0)
+                                                                                                          { reconnect(); }, 1000)
 {
+  log_i("HomeKitDeviceController: %s, %d, %d", instance.c_str(), aid, iid);
 
-  client.onData(dataAvailable);
-  
+  client.onData([this](void *r, AsyncClient *c, void *buf, size_t len)
+                { dataAvailable(r, c, buf, len); });
+
   client.onDisconnect([this](void *r, AsyncClient *c)
                       { onDisconnect(r, c); });
 
@@ -102,10 +65,10 @@ void HomeKitDeviceController::reconnect()
   if (hapCache.find(instance) != hapCache.end())
   {
     service = hapCache[instance];
-    Serial.printf("Cached Service - Name: %s, IP: %s, Port: %d\n",
-                  service.name.c_str(),
-                  service.ip.toString().c_str(),
-                  service.port);
+    //  Serial.printf("Cached Service - Name: %s, IP: %s, Port: %d\n",
+    //                service.name.c_str(),
+    //                service.ip.toString().c_str(),
+    //                service.port);
   }
   else
   {
@@ -135,30 +98,15 @@ void HomeKitDeviceController::onConnect(void *r, AsyncClient *c)
 
 void HomeKitDeviceController::dataAvailable(void *r, AsyncClient *c, void *buf, size_t len)
 {
-  // Serial.printf("[HK]: Data Available %s, %d\n", String((char *)buf).substring(0, len).c_str(), len);
+  // Log the size of the data received
   String host = c->remoteIP().toString() + ":" + String(c->remotePort());
-  String value = processHttpResponse(host, (const char *)buf, len);
-  if( value.length() > 0) {
-    if (eventCallback)
-    {
-      eventCallback(value.c_str());
-    }
+  HTTPMessageParser parse = processHttpResponse(host, (const char *)buf, len);
+
+  log_i("[HK]: Data available from HK Device %s, Length: %zu - %s", instance.c_str(), len, parse.getBody().c_str());
+  if (eventCallback && parse.getStatusCode() == 200  && parse.getBody().length() > 0)
+  {
+    eventCallback(parse.getBody().c_str());
   }
-}
-
-void HomeKitDeviceController::onConnect(void *r, AsyncClient *c)
-{
-  String host = c->remoteIP().toString() + ":" + String(c->remotePort());
-  log_i("[HK]: Connected to HK Device %s", host.c_str());
-  String message = registerMessage(host, aid, iid);
-  client.add(message.c_str(), message.length());
-  client.send();
-}
-
-void HomeKitDeviceController::dataAvailableWrapper(void *r, AsyncClient *c, void *buf, size_t len)
-{
-  HomeKitDeviceController* controller = static_cast<HomeKitDeviceController*>(r);
-  controller->dataAvailable(r, c, buf, len);
 }
 
 void HomeKitDeviceController::onDisconnect(void *r, AsyncClient *c)
@@ -302,9 +250,9 @@ String HomeKitDeviceController::getCharacteristic()
 // Registers a callback to be invoked when data is received
 void HomeKitDeviceController::setEventCallback(DataReceivedCallback callback)
 {
+  log_i("Setting event callback");
   eventCallback = callback;
 }
-
 
 String registerMessage(String host, uint16_t aid, uint16_t iid)
 {

@@ -41,10 +41,10 @@ void hapServicesRefresh()
 
       // Add or update the service in the cache
       hapCache[serviceName] = service;
-      Serial.printf("Service added to cache: %s @ %s:%d\n",
-                    serviceName.c_str(),
-                    serviceIP.toString().c_str(),
-                    servicePort);
+      //  Serial.printf("Service added to cache: %s @ %s:%d\n",
+      //                serviceName.c_str(),
+      //                serviceIP.toString().c_str(),
+      //                servicePort);
     }
     hapServicesTick.interval(15 * 60 * 1000); // Refresh every 15 minutes
   }

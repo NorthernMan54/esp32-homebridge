@@ -16,8 +16,7 @@ int accessoryCount = 0;
 
 void dataReceivedHandler(const char *data)
 {
-  Serial.print("Event Callback: Data received from accessory: ");
-  Serial.println(data);
+  log_i("Event Callback: Data received from accessory: \n%s", data);  
 }
 
 // Initialize accessories and set the event callback
@@ -89,6 +88,7 @@ void HAPDevice::sendEvent(String message)
 {
   if (eventCallback)
   {
+    log_i("Sending event: %s", message.c_str());
     eventCallback(message);
   }
 }

@@ -1,15 +1,13 @@
 #ifndef HOMEKITDEVICECONTROLLER_H
 #define HOMEKITDEVICECONTROLLER_H
 
-#include <Arduino.h> // Correct the path
-
+#include <Arduino.h>
 #include <AsyncTCP.h>
 #include <TickTwo.h>
 #include <functional>
-#include <ui-client.h>
 
-// Define a callback type for received data events
-typedef std::function<void(const char *data)> DataReceivedCallback;
+// Forward declaration of Accessory struct
+struct Accessory;
 
 class HomeKitDeviceController
 {
@@ -20,20 +18,22 @@ public:
   String setCharacteristic(const char *value);
   String setCharacteristic(uint16_t value);
   String getCharacteristic(); // Gets a characteristic value
-  void setEventCallback(DataReceivedCallback callback); // Registers a callback for received data
+  void setEventCallback(void (*callback)(const char *, Accessory *), Accessory *accessory);
 
   void loop();
 
 private:
+  Accessory *contextAccessory; // Store the context
   AsyncClient client;
   String instance;
   IPAddress ip;
 
-  uint16_t aid; // Accessory ID
-  uint16_t iid; // Instance ID
+  uint16_t aid;              // Accessory ID
+  uint16_t iid;              // Instance ID
   TickTwo homekitDeviceTick; // Timer for periodic events
 
-  DataReceivedCallback eventCallback; // Holds the callback function
+  void dataAvailable(void *r, AsyncClient *c, void *buf, size_t len);
+  void (*eventCallback)(const char *, Accessory *);
   void reconnect();
   void onConnect(void *r, AsyncClient *c);
   void onDisconnect(void *r, AsyncClient *c);
@@ -41,4 +41,4 @@ private:
   void sendData(const char *data);
 };
 
-#endif
+#endif // HOMEKITDEVICECONTROLLER_H

@@ -19,6 +19,8 @@ extern "C"
     int button_height;
   } ButtonDisplay;
 
+  lv_obj_t *bootScreen();
+
   ButtonDisplay *ButtonDisplay_create(int width, int height, int rows, int cols, int, int);
   void ButtonDisplay_begin(ButtonDisplay *display);
   void ButtonDisplay_destroy(ButtonDisplay *display);

@@ -4,6 +4,24 @@
 #include <stdlib.h> // For malloc
 #include <stdio.h>
 
+lv_obj_t *bootScreen()
+{
+    static lv_style_t style;
+    lv_style_init(&style);
+    lv_style_set_flex_flow(&style, LV_FLEX_FLOW_ROW_WRAP);
+    lv_style_set_flex_main_place(&style, LV_FLEX_ALIGN_SPACE_EVENLY);
+    lv_style_set_layout(&style, LV_LAYOUT_FLEX);
+    lv_style_set_bg_color(&style, lv_color_hex(0x000000));
+    lv_style_set_bg_image_src(&style, &homebridge_color_round);
+
+    lv_obj_t *screen = lv_obj_create(lv_screen_active());
+    // lv_obj_set_size(screen, width, height);
+    lv_obj_center(screen);
+    lv_obj_add_style(screen, &style, 0);
+
+    return screen;
+}
+
 ButtonDisplay *ButtonDisplay_create(int width, int height, int rows, int cols, int button_width, int button_height)
 {
     ButtonDisplay *display = (ButtonDisplay *)malloc(sizeof(ButtonDisplay));
@@ -60,7 +78,7 @@ ButtonDisplay *ButtonDisplay_create(int width, int height, int rows, int cols, i
 
         // lv_obj_set_style_bg_color(imageButton, lv_color_hex(0xf57c00), LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_t *nameContainer = lv_obj_create(display->buttons[i]);
-        lv_obj_set_size(nameContainer, button_width - 80, button_height -30);
+        lv_obj_set_size(nameContainer, button_width - 80, button_height - 30);
         lv_obj_add_style(nameContainer, &buttonStyle, 0);
         lv_obj_set_flex_flow(nameContainer, LV_FLEX_FLOW_COLUMN);
         lv_obj_set_flex_align(nameContainer, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);

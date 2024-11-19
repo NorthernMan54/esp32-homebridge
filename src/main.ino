@@ -14,8 +14,11 @@
 #include <display.h>
 
 #ifdef LVGL_ENABLED
-#include <esp32_smartdisplay.h>
-#include <ui/ui.h>
+#ifdef LVGL_ARDUINO_GFX
+#include <Arduino_GFX_Library.h>
+#endif
+// #include <esp32_smartdisplay.h>
+// #include <ui/ui.h>
 #endif
 
 String buildDefinitionString = "";
@@ -48,12 +51,17 @@ void setup()
   logSection("WiFi Setup");
   wifiModuleSetup();
   log_i("ESP Information %s", PIOENV);
-  logSection("hapClient Setup");
+  logSection("hapCache Setup");
   hapCacheSetup();
+  logSection("UI Setup");
+  uiClientSetup();
 
 #ifdef LVGL_ENABLED
   log_i("Initializing Smart Display");
-  smartdisplay_init();
+  #ifdef LVGL_ARDUINO_GFX
+   arduinoGFXSetup();
+  #endif
+  //smartdisplay_init();
   log_i("LV_USE_LOG %d", LV_USE_LOG);
 #ifdef LV_USE_LOG
   log_i("LV_LOG_LEVEL %d", LV_LOG_LEVEL);
@@ -65,7 +73,7 @@ void setup()
   // lv_disp_set_rotation(disp, LV_DISP_ROT_180);
   // lv_disp_set_rotation(disp, LV_DISP_ROT_270);
   log_i("ui_init");
-  ui_init();
+  // ui_init();
 // To use third party libraries, enable the define in lv_conf.h: #define LV_USE_QRCODE 1
 #endif
 }
@@ -79,8 +87,10 @@ void loop()
 {
   wifiModuleLoop();
   hapCacheLoop();
+  uiClientLoop();
 
 #ifdef LVGL_ENABLED
+  arduinoGFXLoop();
   auto const now = millis();
 
   // Update the ticker

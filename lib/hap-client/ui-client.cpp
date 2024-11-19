@@ -1,6 +1,7 @@
 #include <ArduinoJson.hpp>
 #include <TickTwo.h>
 #include "ui-client.h"
+#include "display.h"
 
 #include <WiFi.h>
 #include <homeKitDeviceController.h>
@@ -15,15 +16,6 @@ int accessoryCount = 0;
 void configRefresh();
 TickTwo configRefreshTick(configRefresh, 0); // Run once on startup
 
-void configRefresh()
-{
-  logSection("ui-client Get Config");
-  auto config = uiClientGetConfig();
-  log_i("Config: %s", config.as<String>().c_str());
-  addDevices(config);
-  configRefreshTick.interval(15 * 60 * 1000 * 1000); // Refresh every 15 minutes
-}
-
 void uiClientSetup()
 {
   configRefreshTick.start();
@@ -34,13 +26,17 @@ void uiClientLoop()
   if (WiFi.status() == WL_CONNECTED)
   {
     configRefreshTick.update();
+    for (int i = 0; i < accessoryCount; i++)
+    {
+      accessories[i]->controller->loop();
+    }
   }
 }
 
 void dataReceivedHandler(const char *data, Accessory *accessory)
 {
   log_i("Event Callback: Data received from accessory (%s): \n%s",
-        accessory->controller->getInstanceName().c_str(), data);
+        accessory->displayName.c_str(), data);
 }
 
 void addDevices(ArduinoJson::DynamicJsonDocument tiles)
@@ -58,6 +54,8 @@ void addDevices(ArduinoJson::DynamicJsonDocument tiles)
     if (accessoryCount < MAX_ACCESSORIES)
     {
       accessories[accessoryCount] = new Accessory();
+      accessories[accessoryCount]->uuid = uuid;
+      accessories[accessoryCount]->displayName = displayName;
       accessories[accessoryCount]->controller = new HomeKitDeviceController(instanceName, aid, iid);
 
       // Pass the Accessory as context to the callback
@@ -65,7 +63,18 @@ void addDevices(ArduinoJson::DynamicJsonDocument tiles)
 
       accessoryCount++;
     }
+
+    ButtonDisplay_create(DISPLAY_WIDTH, DISPLAY_HEIGHT, 2, 2, 130, 100);
   }
+}
+
+void configRefresh()
+{
+  logSection("UI Get Config");
+  auto config = uiClientGetConfig();
+  log_i("Config: %s", config.as<String>().c_str());
+  addDevices(config);
+  configRefreshTick.interval(15 * 60 * 1000 * 1000); // Refresh every 15 minutes
 }
 
 /*

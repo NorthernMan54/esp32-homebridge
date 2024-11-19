@@ -48,10 +48,10 @@ HomeKitDeviceController::HomeKitDeviceController(String instance, uint16_t acces
                    { onConnect(r, c); });
 
   client.onTimeout([](void *r, AsyncClient *c, uint32_t time)
-                   { Serial.printf("[Comm]: Timeout from Spaa\n"); });
+                   { Serial.printf("[Comm]: Timeout from Homebridge\n"); });
 
   client.onError([](void *r, AsyncClient *c, int8_t error)
-                 { Serial.printf("[Comm]: Connected to Spa %d\n", error); });
+                 { Serial.printf("[Comm]: Error on connection to Homebridge%d\n", error); });
 
   homekitDeviceTick.start();
 }
@@ -107,7 +107,7 @@ void HomeKitDeviceController::dataAvailable(void *r, AsyncClient *c, void *buf, 
   log_i("[HK]: Data available from HK Device %s, Length: %zu - %s", instance.c_str(), len, parse.getBody().c_str());
   if (eventCallback && parse.getStatusCode() == 200  && parse.getBody().length() > 0)
   {
-    eventCallback(parse.getBody().c_str());
+        eventCallback(parse.getBody().c_str(), contextAccessory);
   }
 }
 

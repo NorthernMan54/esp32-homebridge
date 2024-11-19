@@ -1,0 +1,14 @@
+SET(SOURCES components/ui_comp_hkbuttoncontainer.c
+    components/ui_comp.c
+    screens/ui_bootScreen.c
+    screens/ui_mainScreen.c
+    ui_theme_manager.c
+    ui_themes.c
+    ui.c
+    components/ui_comp_hook.c
+    ui_helpers.c
+    images/ui_img_homebridge_color_round_png.c
+    images/ui_img_lightoff_png.c
+    images/ui_img_lightbulb_png.c)
+
+add_library(ui ${SOURCES})

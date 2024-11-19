@@ -3,6 +3,8 @@
 
 #include "homeKitDeviceController.h" // Correct the path
 #include <ArduinoJson.hpp>
+#include "display.h"
+#include "lvgl.h"
 
 
 
@@ -17,6 +19,7 @@ struct Accessory
   String uuid;
   String displayName;
   HomeKitDeviceController *controller;
+  lv_obj_t *button;
 };
 
 #endif

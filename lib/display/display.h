@@ -19,8 +19,20 @@ extern "C"
     int button_height;
   } ButtonDisplay;
 
-  lv_obj_t *bootScreen();
+  typedef struct
+  {
+    lv_obj_t *button; // Array to hold button objects
+    lv_obj_t *imageButton;
+    lv_obj_t *statusLabel;
+    int rows, cols;
+    int button_width;
+    int button_height;
+  } uiHKButton;
 
+  lv_obj_t *uiBootScreen();
+  lv_obj_t *uiMainScreen();
+
+  uiHKButton *uiHKButton_create(lv_obj_t *parent, const char *name, const char *status, const char *icon);
   ButtonDisplay *ButtonDisplay_create(int width, int height, int rows, int cols, int, int);
   void ButtonDisplay_begin(ButtonDisplay *display);
   void ButtonDisplay_destroy(ButtonDisplay *display);

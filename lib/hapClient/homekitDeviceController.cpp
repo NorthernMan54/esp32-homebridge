@@ -58,7 +58,6 @@ HomeKitDeviceController::HomeKitDeviceController(String instance, uint16_t acces
 
 void HomeKitDeviceController::loop()
 {
-  log_i("HomeKitDeviceController: Looping", instance.c_str());
   homekitDeviceTick.update();
 }
 
@@ -252,7 +251,7 @@ String HomeKitDeviceController::getCharacteristic()
 
 // Registers a callback to be invoked when data is received
 // callback signature is (char *data) containing the data received
-  void HomeKitDeviceController::setEventCallback(void (*callback)(const char *, Accessory *), Accessory *accessory)
+  void HomeKitDeviceController::setEventCallback(void (*callback)(const char *, hbAccessory *), hbAccessory *accessory)
   {
     eventCallback = callback;
     contextAccessory = accessory;

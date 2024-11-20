@@ -10,7 +10,7 @@
 #include <ui.h>
 
 extern int accessoryCount;
-extern Accessory *accessories;
+extern hbAccessory *accessories[];
 
 // #define logSection(section) log_i("************* %s **************", section);
 
@@ -34,9 +34,9 @@ void hapClientLoop()
     hapClientRefreshTick.update();
     for (int i = 0; i < accessoryCount; i++)
     {
-      log_i("Looping through accessories %d - %s", i, &accessories[i].displayName);
-      log_i("Accessory: %p %p", &accessories[i], &accessories[i].hapDevice);
-      accessories[i].hapDevice->loop();
+      if (accessories[i]->hapDevice != nullptr) {
+      accessories[i]->hapDevice->loop();
+      }
     }
   }
 }

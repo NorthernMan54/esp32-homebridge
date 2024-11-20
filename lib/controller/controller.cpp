@@ -9,7 +9,7 @@
 #include <ui.h>
 
 const int MAX_ACCESSORIES = 32;
-Accessory *accessories[MAX_ACCESSORIES] = {nullptr};
+hbAccessory *accessories[MAX_ACCESSORIES] = {nullptr};
 int accessoryCount = 0;
 
 void controllerRefresh();
@@ -63,7 +63,7 @@ void update_status(lv_obj_t *parent, const char *new_text)
   }
 }
 
-void dataReceivedHandler(const char *data, Accessory *accessory)
+void dataReceivedHandler(const char *data, hbAccessory *accessory)
 {
   log_i("Event Callback: Data received from accessory (%s): \n%s",
         accessory->displayName.c_str(), data);
@@ -149,7 +149,7 @@ void addDevices(ArduinoJson::DynamicJsonDocument tiles)
 
     if (accessoryCount < MAX_ACCESSORIES)
     {
-      accessories[accessoryCount] = new Accessory();
+      accessories[accessoryCount] = new hbAccessory();
       accessories[accessoryCount]->uuid = uuid;
       accessories[accessoryCount]->displayName = displayName;
       accessories[accessoryCount]->hapDevice = new HomeKitDeviceController(instanceName, aid, iid);

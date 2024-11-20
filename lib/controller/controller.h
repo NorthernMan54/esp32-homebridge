@@ -15,7 +15,7 @@ void addDevices(ArduinoJson::DynamicJsonDocument tiles);
  * @brief Holder for an accessory, links the accessory to the controller and the UI button
  * 
  */
-struct Accessory
+struct hbAccessory
 {
   String uuid;                          // UUID / type of the accessory
   String displayName;                   // Display name of the accessory

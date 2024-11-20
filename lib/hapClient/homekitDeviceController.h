@@ -7,7 +7,7 @@
 #include <functional>
 
 // Forward declaration of Accessory struct
-struct Accessory;
+struct hbAccessory;
 
 class HomeKitDeviceController
 {
@@ -18,12 +18,12 @@ public:
   String setCharacteristic(const char *value);
   String setCharacteristic(uint16_t value);
   String getCharacteristic(); // Gets a characteristic value
-  void setEventCallback(void (*callback)(const char *, Accessory *), Accessory *accessory);
+  void setEventCallback(void (*callback)(const char *, hbAccessory *), hbAccessory *accessory);
 
   void loop();
 
 private:
-  Accessory *contextAccessory; // Store the context
+  hbAccessory *contextAccessory; // Store the context
   AsyncClient client;
   String instance;
   IPAddress ip;
@@ -33,7 +33,7 @@ private:
   TickTwo homekitDeviceTick; // Timer for periodic events
 
   void dataAvailable(void *r, AsyncClient *c, void *buf, size_t len);
-  void (*eventCallback)(const char *, Accessory *);
+  void (*eventCallback)(const char *, hbAccessory *);
   void reconnect();
   void onConnect(void *r, AsyncClient *c);
   void onDisconnect(void *r, AsyncClient *c);

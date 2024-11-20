@@ -134,9 +134,38 @@ void arduinoGFXSetup()
   }
   gfx->fillScreen(BLACK);
 
+// Backlight 
 #ifdef GFX_BL
+  // pinMode(GFX_BL, OUTPUT);
+  // digitalWrite(GFX_BL, HIGH);
+
+  // Use last PWM_CHANNEL for backlight
+#define PWM_CHANNEL_BCKL (SOC_LEDC_CHANNEL_NUM - 1)
+#define PWM_FREQ_BCKL 400
+#define PWM_BITS_BCKL 8
+#define PWM_MAX_BCKL ((1 << PWM_BITS_BCKL) - 1)
+
   pinMode(GFX_BL, OUTPUT);
-  digitalWrite(GFX_BL, HIGH);
+  digitalWrite(GFX_BL, LOW);
+#if ESP_ARDUINO_VERSION_MAJOR >= 3
+  ledcAttach(GFX_BL, PWM_FREQ_BCKL, PWM_BITS_BCKL);
+#else
+  ledcSetup(PWM_CHANNEL_BCKL, PWM_FREQ_BCKL, PWM_BITS_BCKL);
+  ledcAttachPin(GFX_BL, PWM_CHANNEL_BCKL);
+#endif
+
+  log_v("duty:%2f", duty);
+float duty = 0.5f;
+  if (duty > 1.0f)
+    duty = 1.0f;
+  if (duty < 0.0f)
+    duty = 0.0f;
+#if ESP_ARDUINO_VERSION_MAJOR >= 3
+  ledcWrite(GPIO_BCKL, duty * PWM_MAX_BCKL);
+#else
+  ledcWrite(PWM_CHANNEL_BCKL, duty * PWM_MAX_BCKL);
+#endif
+
 #endif
 
   // Init touch device

@@ -2,6 +2,7 @@ SET(SOURCES components/ui_comp_hkbuttoncontainer.c
     components/ui_comp.c
     screens/ui_bootScreen.c
     screens/ui_mainScreen.c
+    screens/ui_unSeen.c
     ui_theme_manager.c
     ui_themes.c
     ui.c

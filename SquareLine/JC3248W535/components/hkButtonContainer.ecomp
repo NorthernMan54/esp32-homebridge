@@ -1444,7 +1444,7 @@
         {
           "nid": -2110383544,
           "strtype": "OBJECT/Name",
-          "strval": "Container2",
+          "strval": "hkLabelContainer",
           "InheritedType": 10
         },
         {
@@ -1696,22 +1696,7 @@
         },
         {
           "part": "lv.PART.MAIN",
-          "childs": [
-            {
-              "nid": -1535933024,
-              "strtype": "_style/StyleState",
-              "strval": "DEFAULT",
-              "childs": [
-                {
-                  "nid": 1078410085,
-                  "strtype": "_style/Text_Font",
-                  "strval": "montserrat_16",
-                  "InheritedType": 3
-                }
-              ],
-              "InheritedType": 1
-            }
-          ],
+          "childs": [],
           "nid": 1395628930,
           "strtype": "CONTAINER/Style_main",
           "strval": "lv.PART.MAIN, Rectangle, Pad, Text, Transform",
@@ -1788,6 +1773,7 @@
     },
     {
       "nid": -1344657869,
+      "flags": 1048576,
       "strtype": "OBJECT/Flags",
       "InheritedType": 1
     },
@@ -2023,16 +2009,10 @@
               "InheritedType": 7
             },
             {
-              "nid": 1407953715,
-              "strtype": "_style/Border width",
-              "integer": 1,
-              "InheritedType": 6
-            },
-            {
-              "nid": 1945689490,
-              "strtype": "_style/Shadow_Color",
+              "nid": 756103340,
+              "strtype": "_style/Text_Color",
               "intarray": [
-                0,
+                6,
                 0,
                 0,
                 255
@@ -2040,24 +2020,59 @@
               "InheritedType": 7
             },
             {
-              "nid": 1302911346,
-              "strtype": "_style/Padding",
+              "nid": 529783365,
+              "strtype": "_style/Text_Font",
+              "strval": "montserrat_16",
+              "InheritedType": 3
+            }
+          ],
+          "InheritedType": 1
+        },
+        {
+          "nid": 630375707,
+          "strtype": "_style/StyleState",
+          "strval": "CHECKED",
+          "childs": [
+            {
+              "nid": -1479238673,
+              "strtype": "_style/Bg_Radius",
+              "integer": 10,
+              "InheritedType": 6
+            },
+            {
+              "nid": 1222916292,
+              "strtype": "_style/Bg_Color",
               "intarray": [
-                0,
-                5,
-                0,
-                0
+                255,
+                255,
+                255,
+                255
               ],
               "InheritedType": 7
             },
             {
-              "nid": 1394651432,
-              "strtype": "_style/Padding_RowCol",
+              "nid": -2098913176,
+              "strtype": "_style/Border width",
+              "InheritedType": 6
+            },
+            {
+              "nid": -1673033327,
+              "strtype": "_style/Text_Color",
+              "strval": "HK Orange",
+              "integer": -220585934,
               "intarray": [
-                555,
-                5555
+                245,
+                124,
+                0,
+                255
               ],
               "InheritedType": 7
+            },
+            {
+              "nid": -80572262,
+              "strtype": "_style/Text_Font",
+              "strval": "montserrat_16",
+              "InheritedType": 3
             }
           ],
           "InheritedType": 1

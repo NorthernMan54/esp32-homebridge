@@ -58,6 +58,7 @@ HomeKitDeviceController::HomeKitDeviceController(String instance, uint16_t acces
 
 void HomeKitDeviceController::loop()
 {
+  log_i("HomeKitDeviceController: Looping", instance.c_str());
   homekitDeviceTick.update();
 }
 
@@ -244,8 +245,8 @@ String HomeKitDeviceController::getCharacteristic()
 
   int httpCode = http.GET();
   String payload = http.getString();
-  log_i("HTTP GET: %d", httpCode);
-  log_i("Payload: %s", payload.c_str());
+  // log_i("HTTP GET: %d", httpCode);
+  // log_i("Payload: %s", payload.c_str());
   return payload;
 }
 
@@ -269,7 +270,7 @@ String registerMessage(String host, uint16_t aid, uint16_t iid)
   headers += "connection: keep-alive\r\n";
   headers += "Content-Length: " + String(contentLength) + "\r\n";
   headers += "\r\n";
-  log_i("Event Message: \n%s%s\n", headers.c_str(), +payload.c_str());
+  // log_i("Event Message: \n%s%s\n", headers.c_str(), +payload.c_str());
   return headers + payload + "\r\n";
 }
 

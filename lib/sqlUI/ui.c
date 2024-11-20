@@ -18,6 +18,14 @@ lv_obj_t *ui_Image1;
 // SCREEN: ui_mainScreen
 void ui_mainScreen_screen_init(void);
 lv_obj_t *ui_mainScreen;
+
+
+// SCREEN: ui_unSeen
+void ui_unSeen_screen_init(void);
+lv_obj_t *ui_unSeen;
+lv_obj_t *ui_hkButtonContainer2;
+lv_obj_t *ui_hkButtonContainer3;
+lv_obj_t *ui_hkButtonContainer4;
 lv_obj_t *ui____initial_actions0;
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
@@ -39,6 +47,7 @@ lv_theme_t *theme = lv_theme_default_init(dispp, lv_palette_main(LV_PALETTE_BLUE
 lv_disp_set_theme(dispp, theme);
 ui_bootScreen_screen_init();
 ui_mainScreen_screen_init();
+ui_unSeen_screen_init();
 ui____initial_actions0 = lv_obj_create(NULL);
 lv_disp_load_scr( ui_bootScreen);
 }

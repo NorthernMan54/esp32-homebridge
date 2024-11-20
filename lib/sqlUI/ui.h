@@ -36,6 +36,12 @@ extern lv_obj_t *ui_Image1;
 // SCREEN: ui_mainScreen
 void ui_mainScreen_screen_init(void);
 extern lv_obj_t *ui_mainScreen;
+// SCREEN: ui_unSeen
+void ui_unSeen_screen_init(void);
+extern lv_obj_t *ui_unSeen;
+extern lv_obj_t *ui_hkButtonContainer2;
+extern lv_obj_t *ui_hkButtonContainer3;
+extern lv_obj_t *ui_hkButtonContainer4;
 extern lv_obj_t *ui____initial_actions0;
 
 LV_IMG_DECLARE( ui_img_homebridge_color_round_png);   // assets/homebridge_color_round.png

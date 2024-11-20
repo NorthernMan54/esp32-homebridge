@@ -1,33 +1,29 @@
 #include <ArduinoJson.hpp>
 #include <TickTwo.h>
-#include "ui-client.h"
-#include "display.h"
+#include "hapClient.h"
+#include "controller.h"
 
 #include <WiFi.h>
 #include <homeKitDeviceController.h>
 #include "../../src/main.h"
 #include <ui.h>
 
-// #define logSection(section) log_i("************* %s **************", section);
-
 const int MAX_ACCESSORIES = 32;
 Accessory *accessories[MAX_ACCESSORIES] = {nullptr};
 int accessoryCount = 0;
 
-void configRefresh();
-TickTwo configRefreshTick(configRefresh, 0); // Run once on startup
+void controllerRefresh();
+TickTwo controllerRefreshTick(controllerRefresh, 0); // Run once on startup
 
-lv_obj_t *mainSreen;
 
-void uiClientSetup()
+void controllerSetup()
 {
-  configRefreshTick.start();
-  // mainSreen = uiMainScreen();
+  controllerRefreshTick.start();
 }
 
 bool firstBoot = true;
 
-void uiClientLoop()
+void controllerLoop()
 {
   if (WiFi.status() == WL_CONNECTED)
   {
@@ -36,10 +32,10 @@ void uiClientLoop()
       firstBoot = false;
       lv_disp_load_scr(ui_mainScreen);
     };
-    configRefreshTick.update();
+    controllerRefreshTick.update();
     for (int i = 0; i < accessoryCount; i++)
     {
-      accessories[i]->controller->loop();
+      accessories[i]->hapDevice->loop();
     }
   }
 }
@@ -98,22 +94,28 @@ void dataReceivedHandler(const char *data, Accessory *accessory)
     int value = characteristic["value"];
 
     // Print extracted values
-    Serial.println("Extracted values:");
-    Serial.print("aid: ");
-    Serial.println(aid);
-    Serial.print("iid: ");
-    Serial.println(iid);
-    Serial.print("value: ");
-    Serial.println(value);
+    // Serial.println("Extracted values:");
+    // Serial.print("aid: ");
+    // Serial.println(aid);
+    // Serial.print("iid: ");
+    // Serial.println(iid);
+    // Serial.print("value: ");
+    // Serial.println(value);
     update_status(accessory->button, (value ? "On" : "Off"));
+
+    if (value)
+    {
+      lv_obj_add_state(accessory->button, LV_STATE_CHECKED);
+    }
+    else
+    {
+      lv_obj_remove_state(accessory->button, LV_STATE_CHECKED);
+    }
   }
   else
   {
-    Serial.println("Characteristics array not found.");
+    Serial.println("ERROR: Characteristics array not found.");
   }
-
-  // update_status(accessories[accessoryCount]->button, data);
-  // lv_label_set_text(accessory->button->statusLabel, data);
 }
 
 void update_label_text(lv_obj_t *parent, const char *new_text)
@@ -150,17 +152,17 @@ void addDevices(ArduinoJson::DynamicJsonDocument tiles)
       accessories[accessoryCount] = new Accessory();
       accessories[accessoryCount]->uuid = uuid;
       accessories[accessoryCount]->displayName = displayName;
-      accessories[accessoryCount]->controller = new HomeKitDeviceController(instanceName, aid, iid);
+      accessories[accessoryCount]->hapDevice = new HomeKitDeviceController(instanceName, aid, iid);
 
       // Pass the Accessory as context to the callback
-      accessories[accessoryCount]->controller->setEventCallback(dataReceivedHandler, accessories[accessoryCount]);
+      accessories[accessoryCount]->hapDevice->setEventCallback(dataReceivedHandler, accessories[accessoryCount]);
       accessories[accessoryCount]->button = ui_hkButtonContainer_create(ui_mainScreen);
 
       log_i("Accessory %s: children: %d", displayName.c_str(), lv_obj_get_child_cnt(accessories[accessoryCount]->button));
       // lv_obj_t * child = ui_comp_get_child(accessories[accessoryCount]->button, UI_COMP_HKBUTTONCONTAINER_CONTAINER2_HKDISPLAYNAME);
       update_label_text(accessories[accessoryCount]->button, displayName.c_str());
 
-      String data = accessories[accessoryCount]->controller->getCharacteristic();
+      String data = accessories[accessoryCount]->hapDevice->getCharacteristic();
       dataReceivedHandler(data.c_str(), accessories[accessoryCount]);
 
       accessoryCount++;
@@ -168,46 +170,7 @@ void addDevices(ArduinoJson::DynamicJsonDocument tiles)
   }
 }
 
-void configRefresh()
+void controllerRefresh()
 {
-  logSection("UI Get Config");
-  auto config = uiClientGetConfig();
-  log_i("Config: %s", config.as<String>().c_str());
-  addDevices(config);
-  configRefreshTick.interval(15 * 60 * 1000 * 1000); // Refresh every 15 minutes
-}
-
-/*
-[{
-  instanceName: "Tasmota-CC79",
-  uuid: "43",
-  displayName: "West Bedroom",
-  aid: 75,
-  iid: 10
-}]
-*/
-/**
- * @brief
- *
- * @return ArduinoJson::DynamicJsonDocument
- */
-ArduinoJson::DynamicJsonDocument uiClientGetConfig()
-{
-  ArduinoJson::DynamicJsonDocument doc(1024);
-  ArduinoJson::JsonArray arr = doc.to<ArduinoJson::JsonArray>();
-
-  ArduinoJson::JsonObject obj1 = arr.createNestedObject();
-  obj1["instanceName"] = "Heisenberg-4534";
-  obj1["uuid"] = "25";
-  obj1["displayName"] = "Yamaha Power";
-  obj1["aid"] = 7;
-  obj1["iid"] = 10;
-
-  ArduinoJson::JsonObject obj = arr.createNestedObject();
-  obj["instanceName"] = "Tasmota-CC79";
-  obj["uuid"] = "43";
-  obj["displayName"] = "West Bedroom";
-  obj["aid"] = 75;
-  obj["iid"] = 10;
-  return doc;
+  // unused
 }
